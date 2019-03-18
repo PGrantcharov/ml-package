@@ -1,0 +1,8 @@
+README.md
+setup.py
+mlAlgos/__init__.py
+mlAlgos.egg-info/PKG-INFO
+mlAlgos.egg-info/SOURCES.txt
+mlAlgos.egg-info/dependency_links.txt
+mlAlgos.egg-info/not-zip-safe
+mlAlgos.egg-info/top_level.txt
