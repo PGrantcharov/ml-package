@@ -1,6 +1,6 @@
 Directs
 /mlAlgos.egg-info
 /test_data
-
+/.idea
 .DS_Store
-.idea
+
