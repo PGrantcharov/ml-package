@@ -1,6 +1,6 @@
 # ml-package
 
-##Own implementations of four machine learning algorithms using NumPy
+#### Own implementations of four machine learning algorithms using NumPy
 
 Current algorithms include:
 1) Linear Regression
@@ -10,7 +10,7 @@ Current algorithms include:
     ii) Ridge regression
 2) Logistic Regression (binary)
     
-    i) Standard solver
+    i) Standard logistic link function optimizer
     
     ii) Newton-method solver (2nd degree approximation)
     
@@ -19,14 +19,15 @@ Current algorithms include:
 
 
 To complement these algorithms, this package also 
-contains methods performing functions such as:
+contains methods to perform functions such as:
 1) Train-Test splits
 2) Cross validation
 3) Test set prediction
 4) Confusion matrix calculator
 5) Accuracy score calculator
 6) RMSE score calculator
-7) Polynomial feature expansions
+7) R^2 score calculator
+8) Polynomial feature expansions
 
 Please note that there is minimal input checking, so please
 review source code to diagnose sources of error.
