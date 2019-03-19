@@ -1,5 +1,6 @@
 # ml-package
-###Own implementations of four machine learning algorithms using NumPy
+
+##Own implementations of four machine learning algorithms using NumPy
 
 Current algorithms include:
 1) Linear Regression
