@@ -1,3 +1,11 @@
+"""
+File contains methods to perform linear regression, without (linear_regression())
+or with (ridge_regression()) regularization.
+
+Can manually train model by calling individual methods from this file and .General,
+or can utilize comprehensive methods to perform training, cross-validation (optional),
+prediction, and evaluation all in one method.
+"""
 from .General import *
 
 
@@ -26,16 +34,17 @@ def predict(x, w):
 
 
 def linear_regression(x, y, cv=1, test_prop=0.2, scale=False, randomize=True,
-                      lamb=0.0, poly_expand=1):
+                      lamb=0.0, poly_expand=1, rmse=True):
     """
     Get scores from linear regression model all in one method.
 
     By default, will train on random 80% of data and return RMSE score on
     other 20%.
 
-    Can perform cross validation by specifying number of splits, set custom
-    test proportion (ignored if CV != 1), scale features, expand feature
-    space by polynomial degree, and turn off random shuffling of data.
+    Can perform cross validation by specifying number of splits, change score
+    metric to R^2 instead of RMSE, set custom test proportion (ignored if
+    CV != 1), scale features, expand feature space by polynomial degree, and
+    turn off random shuffling of data.
 
     :param x: feature data
     :param y: target variable
@@ -66,7 +75,9 @@ def linear_regression(x, y, cv=1, test_prop=0.2, scale=False, randomize=True,
 
         # get weights, predict and get RMSE
         weights = get_weights(x_train, y_train, lamb)
-        scores = np.append(scores, get_rmse(predict(x_test, weights), y_test))
+        y_pred = predict(x_test, weights)
+        score = get_rmse(y_pred, y_test) if rmse else get_r_squared(y_pred, y_test)
+        scores = np.append(scores, score)
 
     return scores
 

@@ -28,6 +28,19 @@ def get_rmse(pred, test):
     return np.sqrt(((pred - test) ** 2).sum() / len(pred))
 
 
+def get_r_squared(pred, test):
+    """
+    Returns R^2 value for given predictions vs. actual values
+    :param pred: n-by-1 prediction array
+    :param test: n-by-1 test array
+    :return: R^2 value
+    """
+    n = len(pred)
+    num = n * (pred * test).sum() - (pred.sum() * test.sum())
+    den = np.sqrt(((n * (pred ** 2).sum()) - (pred.sum() ** 2)) * ((n * (test ** 2).sum()) - (test.sum() ** 2)))
+    return (num / den) ** 2
+
+
 def expand_features(x, p, offset=True):
     """
     1) Constructs new X matrix for given degree
@@ -65,8 +78,8 @@ def get_split(x, y, bins, rand_order, split):
 
 def get_bin_sizes(n, bins, test_prop):
     """
-    An algorithm that gets the number of data points that
-    need to be in each of the bins.
+    An algorithm that gets the number of records that need to be in eacg
+    of the bins.
     :param n: number of data points that need to be split
     :param bins: integer representing number of desired bins
     :param test_prop: proportion to use in test set if no cross validation
@@ -87,19 +100,20 @@ def get_bin_sizes(n, bins, test_prop):
     return bin_sizes.astype(int)
 
 
-def get_conf_mat(y_pred, y_test):
+def get_conf_mat(y_pred, y_test, neg=0):
     """
     Returns confusion matrix from a prediction and test
     set, where the columns correspond to TRUTH and the
     rows correspond to prediction.
     :param y_pred: prediction array of targets
     :param y_test: test array of targets
+    :param neg: value of negative target in target set
     :return: 2-by-2 numpy array confusion matrix
     """
     tp = ((y_pred + y_test) == 2).sum()
-    tn = ((y_pred + y_test) == -2).sum()
-    fp = ((y_pred - y_test) == 2).sum()
-    fn = ((y_pred - y_test) == -2).sum()
+    tn = ((y_pred + y_test) == 2 * neg).sum()
+    fp = ((y_pred - y_test) == 1 - neg).sum()
+    fn = ((y_pred - y_test) == -1 + neg).sum()
     return np.array([[tp, fp], [fn, tn]])
 
 

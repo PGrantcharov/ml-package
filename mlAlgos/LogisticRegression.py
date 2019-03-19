@@ -1,7 +1,15 @@
+"""
+This file contains the methods to perform a binary classification using
+a logistic regression. Uses the logistic link function.
+
+One can call individual methods (notably get_weights and predict) in
+this file and in General.py to manually utilize algorithm, or call
+the all-in-one logistic_regression() method to do this for them.
+"""
 from .General import *
 
 
-def get_yx(y_train, x_train):
+def _get_yx(y_train, x_train):
     """
     Gets the n-by-m shaped matrix needed to calculate
     the derivative to update the weights for a given
@@ -13,7 +21,7 @@ def get_yx(y_train, x_train):
     return np.multiply(y_train, x_train)
 
 
-def get_sigmoid(x_train, y_train, w):
+def _get_sigmoid(x_train, y_train, w):
     """
     Gets the sigmoid function for a given training set.
     :param x_train: feature training set
@@ -40,7 +48,7 @@ def predict(x_test, w):
     return pred
 
 
-def get_first_deriv(sigmoid, yx):
+def _get_first_deriv(sigmoid, yx):
     """
     Gets the gradient from a test set iteration.
     :param sigmoid: n-length sigmoid vector
@@ -50,7 +58,7 @@ def get_first_deriv(sigmoid, yx):
     return (np.multiply(1 - sigmoid, yx)).sum(axis=0).reshape(-1, 1)
 
 
-def get_second_deriv(x_train, sigmoid):
+def _get_second_deriv(x_train, sigmoid):
     """
     Gets the Hessian matrix from the training feature data and the
     sigmoid function array. Subtracts 10e-3 from diagonal to avoid
@@ -66,7 +74,7 @@ def get_second_deriv(x_train, sigmoid):
     return -1 * second_der - np.identity(second_der.shape[0])*10e-3
 
 
-def update_weights(x_train, y_train, w, step, yx, newton):
+def _update_weights(x_train, y_train, w, step, yx, newton):
     """
     Gets the updated weights vector. Will follow different procedure
     depending on whether Newton method is followed.
@@ -78,12 +86,26 @@ def update_weights(x_train, y_train, w, step, yx, newton):
     :param newton: boolean, True = follow Newton method
     :return: updated m-length w vector
     """
-    sigmoid = get_sigmoid(x_train, y_train, w)
-    first_der = get_first_deriv(sigmoid, yx)
+    sigmoid = _get_sigmoid(x_train, y_train, w)
+    first_der = _get_first_deriv(sigmoid, yx)
     if newton:
-        second_der = get_second_deriv(x_train, sigmoid.flatten())
+        second_der = _get_second_deriv(x_train, sigmoid.flatten())
         return w - np.dot(np.linalg.inv(second_der), first_der)
     return w + step * first_der
+
+
+def get_weights(x_train, y_train, step, newton, iterations):
+    # initialize weight vector
+    weights = np.zeros(x_train.shape[1]).reshape(-1, 1)
+
+    # define yx component of training function as it is constant between iterations
+    yx = _get_yx(y_train, x_train)
+
+    # keep updating weights for iteration number
+    for i in range(iterations):
+        weights = _update_weights(x_train, y_train, weights, step, yx, newton)
+
+    return weights
 
 
 def logistic_regression(x, y, cv=1, iterations=1000, step=10e-6,
@@ -101,18 +123,18 @@ def logistic_regression(x, y, cv=1, iterations=1000, step=10e-6,
     * Notes:
         - positive and negative class have to be labelled 1 and -1
         - Newton solver prone to overflow
-        
+
     :param x: feature data
     :param y: target variable
     :param cv: integer number of cross validation folds
-    :param iterations: number of iterations to increa
+    :param iterations: number of iterations to update weight vector
     :param step: step size / regularization parameter to increment weight update
     :param test_prop: test proportion when CV = 1
     :param scale: boolean indicating whether to standardize features
     :param randomize: boolean indication whether to shuffle data
     :param newton: boolean of whether to use Newton solver
     :param poly_expand: degree number to expand feature space
-    :return:
+    :return: list of confusion matrices for each test set evaluation
     """
 
     # expand feature space by polynomial
@@ -124,7 +146,7 @@ def logistic_regression(x, y, cv=1, iterations=1000, step=10e-6,
     # permute order for cross validation
     order = np.random.permutation(len(y)) if randomize else np.arange(0, len(y))
 
-    # initialize array to store RMSE scores from each split
+    # initialize list to store confusion matrices from each split
     scores = []
 
     for split in range(cv):
@@ -132,17 +154,11 @@ def logistic_regression(x, y, cv=1, iterations=1000, step=10e-6,
         x_test, y_test, x_train, y_train = get_split(x, y, bin_sizes, order, split)
         x_train, x_test = standardize(x_train, x_test) if scale else (x_train, x_test)
 
-        # initialize weight vector
-        weights = np.zeros(x_train.shape[1]).reshape(-1, 1)
+        # get weight vector
+        weights = get_weights(x_train, y_train, step, newton, iterations)
 
-        # define yx component of training function as it is constant between iterations
-        yx = get_yx(y_train, x_train)
-
-        # keep updating weights for iteration number
-        for i in range(iterations):
-            weights = update_weights(x_train, y_train, weights, step, yx, newton)
-
+        # predict, append confusion matrix to scores list
         y_pred = predict(x_test, weights)
-        scores.append(get_conf_mat(y_pred, y_test))
+        scores.append(get_conf_mat(y_pred, y_test, -1))
 
     return scores
