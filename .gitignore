@@ -2,5 +2,8 @@ Directs
 /mlAlgos.egg-info
 /test_data
 /.idea
+/mlAlgos/__pycache__
+
+Files
 .DS_Store
 
