@@ -3,6 +3,8 @@ import numpy as np
 
 def standardize(x_train, x_test):
     """
+    TODO: vectorize this
+
     Standardizes the training and test feature matrices
     :param x_train: training data array
     :param x_test: testing data array

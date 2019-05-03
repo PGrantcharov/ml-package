@@ -8,6 +8,7 @@ Current algorithms include:
     i) Standard least squares regression
     
     ii) Ridge regression
+    
 2) Logistic Regression (binary)
     
     i) Standard logistic link function optimizer
@@ -15,8 +16,10 @@ Current algorithms include:
     ii) Newton-method solver (2nd degree approximation)
     
 3) K-Nearest Neighbors (supports multi-class)
+
 4) Naive Bayes (supports multi-class)
 
+5) K-Means
 
 To complement these algorithms, this package also 
 contains methods to perform functions such as:
